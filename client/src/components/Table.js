@@ -12,20 +12,21 @@ const Table = () => {
     const numbers = [4, 3, 2, 1, 0];
     const [condition, setCondition] = useState([]);
     const [sortData, setSortData] = useState({key: 'date', keySort: 'asc'})
-    // const [sorting, setSorting] = useState({field: "", oreder: ""})
-    const [sortable, setSortable] = useState(true)
     const [currentProducts, setCurrentProducts] = useState([]);
+
+    // condition lists
     const lists = [
         {text: 'Date', key: 'date'},
         {text: 'Title', key: 'title'},
         {text: 'Quantity', key: 'quantity'},
         {text: 'Distance', key: 'distance'},
     ]
+    // condition lists
 
     // fetching api
     useEffect(() => {
         setLoading(true);
-        axios.get("http://localhost:5000/products/")
+        axios.get("https://products-project-app.herokuapp.com/products")
             .then((res) => {
                 if (res.data.success)
                     setProducts(res.data.products);
@@ -33,13 +34,10 @@ const Table = () => {
             })
             .catch((err) => console.log(err))
     }, [])
+    // fetching api
 
+    // sorting products
     const sortProducts = (param) => {
-        // currentProducts.sort((a, b) => {
-        //     if (sortData.keySort === 'asc')
-        //         a[sortData.key] - b[sortData.key]
-        //     else b[sortData.key] - a[sortData.key]
-        // })
         if (sortData.key === param) {
             if (sortData.keySort === 'asc')
                 setSortData({...sortData, keySort: 'desc'})
@@ -47,23 +45,6 @@ const Table = () => {
         } else {
             setSortData({key: param, keySort: 'asc'});
         }
-
-        // if (sortData.keySort === 'asc') {
-        //     currentProducts.sort((a, b) => {
-        //         if (a[sortData.key] < b[sortData.key]) {
-        //             return -1
-        //         }
-        //         if (a[sortData.key] > b[sortData.key]) {
-        //             return 1
-        //         }
-        //         return 0
-        //     })
-        //
-        //     setCurrentProducts(currentProducts)
-        // } else {
-        //     currentProducts.reverse()
-        //     setCurrentProducts(currentProducts)
-        // }
         console.log(sortData.key)
     }
 
@@ -89,7 +70,7 @@ const Table = () => {
         }
         setCurrentProducts([...currentProducts]);
     }, [sortData])
-
+    // sorting products
 
     // pagination
     let indefOfLastProduct = currentPage * productPerPage;
@@ -106,7 +87,7 @@ const Table = () => {
 
     }, [indexOfFirstProduct, indefOfLastProduct, products, search])
 
-
+    // filter products
     useMemo(() => {
         if (search) {
             setCurrentProducts(products.filter(
@@ -118,7 +99,9 @@ const Table = () => {
             ))
         }
     }, [search])
+    // filter products
 
+    // delete conditions
     function deleteItem(id) {
         condition.forEach((item, index) => {
             if (item._id === id) {
@@ -127,6 +110,7 @@ const Table = () => {
         })
         setCondition([...condition])
     }
+    // delete conditions
 
     return (
         <div>
@@ -147,8 +131,10 @@ const Table = () => {
                         key: 'quantity'
                     }, {name: "Distance", key: 'distance'}].map((item) => (
                         <th key={item.name} onClick={() => sortProducts(item.key)} scope={'col'}>{item.name}
-                            {item.key === sortData.key && sortData.keySort === 'asc' && <span>&#8595;</span>}
-                            {item.key === sortData.key && sortData.keySort === 'desc' && <span>&#8593;</span>}
+                            {item.key === sortData.key && sortData.keySort === 'asc' &&
+                                <i style={{cursor: 'pointer'}} className="fa-solid fa-arrow-down mx-2"></i>}
+                            {item.key === sortData.key && sortData.keySort === 'desc' &&
+                                <i style={{cursor: 'pointer'}} className="fa-solid fa-arrow-up mx-2"></i>}
                         </th>
                     ))}
                     <th scope={'col'}>Parameters</th>
@@ -181,6 +167,7 @@ const Table = () => {
             <Pagination productsPerPage={productPerPage} currentPage={currentPage} totalProducts={products.length}
                         paginate={paginate}/>
 
+            {/* condition ui */}
             {condition.length > 0 &&
                 <table className='table table-hover table-bordered'>
                     <tbody>
